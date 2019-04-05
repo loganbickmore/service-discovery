@@ -1,17 +1,14 @@
-# consul no cluster
 version: '3'
 
 services:
   consul:
     image: consul:latest
     container_name: consul
-    command: agent -ui
+    #command: agent -ui -dev
     ports:
-      - 8500:8500
-      - 8080:80
-      - 8443:443
+    - "8500:8500"
     environment:
-      - CONSUL_BIND_INTERFACE=eth0
+    - CONSUL_BIND_INTERFACE=eth0
 
   registrator:
     image: gliderlabs/registrator:latest
@@ -21,3 +18,20 @@ services:
     depends_on:
       - consul
     command: consul://consul:8500
+
+
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "8080:80"
+
+  foo:
+    build:
+      context: .
+      dockerfile: Dockerfile.python-server
+      #ports:
+      #- "8000:8000"
+
