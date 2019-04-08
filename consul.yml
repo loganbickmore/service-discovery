@@ -1,37 +1,45 @@
-version: '3'
+version: '3.4'
 
 services:
   consul:
     image: consul:latest
-    container_name: consul
     #command: agent -ui -dev
     ports:
     - "8500:8500"
     environment:
+    - SERVICE_IGNORE=true
     - CONSUL_BIND_INTERFACE=eth0
 
   registrator:
     image: gliderlabs/registrator:latest
-    container_name: registrator
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock
     depends_on:
       - consul
-    command: consul://consul:8500
+    command: -cleanup -resync 60 -internal consul://consul:8500
 
 
   nginx:
-    container_name: nginx
     build:
       context: .
       dockerfile: Dockerfile.nginx
     ports:
       - "8080:80"
+      - "8443:443"
+    environment:
+      - SERVICE_NAME=nginx
+      - SERVICE_80_NAME=nginx
+      - SERVICE_443_NAME=nginx
+      - SERVICE_TAGS=nginx,consul-template,load-balancing
 
+  # TODO: setup healtcheck endpoint. and healthchecking in general.
   foo:
-    build:
-      context: .
-      dockerfile: Dockerfile.python-server
-      #ports:
-      #- "8000:8000"
+    image: node:alpine
+    command: node -e "const a={ip:os.networkInterfaces().eth0[0].address,hostname:os.hostname()}; http.createServer((req,res)=>{console.log(a); res.write(JSON.stringify(a)); res.end()}).listen(80)"
+    ports:
+      - "80"
+    environment:
+      - SERVICE_NAME=foo
+      - SERVICE_80_NAME=foo
+      - SERVICE_TAGS=nodejs,dummy
 
