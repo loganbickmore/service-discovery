@@ -10,6 +10,7 @@ Docs for tools used
 
 # Quickstart
 
+## Manage
 #### Build
 
 `docker-compose build --no-cache --force-rm`
@@ -29,3 +30,10 @@ Docs for tools used
 #### Scale
 
 `docker-compose up -d --scale foo=3 --scale bar=3`
+
+
+## Access
+
+- Consul: http://localhost:8500
+- foo: http://localhost:8080/foo
+- bar: http://localhost:8080/bar (should be dead)
