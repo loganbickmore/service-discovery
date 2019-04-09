@@ -10,19 +10,22 @@ Docs for tools used
 
 # Quickstart
 
-## Startup everything
+#### Build
 
-Build
 `docker-compose build --no-cache --force-rm`
 
-Start, or recreated changed containers
+#### Start, or recreated changed containers
+
 `docker-compose up -d`
 
-Tail logs
+#### Tail logs
+
 `docker-compose logs -f`
 
-Stop
+#### Stop
+
 `docker-compose down`
 
-Scale
+#### Scale
+
 `docker-compose up -d --scale foo=3 --scale bar=3`
