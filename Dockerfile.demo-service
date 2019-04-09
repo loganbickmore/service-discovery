@@ -1,0 +1,10 @@
+FROM golang as build
+WORKDIR /build
+COPY src/demo-service/* ./
+RUN GOOS=linux CGO_ENABLED=0 go build -o app .
+
+FROM alpine:latest  
+WORKDIR /
+COPY --from=build /build/app /usr/local/bin/app
+EXPOSE 8080
+CMD ["app"]  

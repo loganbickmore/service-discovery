@@ -3,7 +3,6 @@ version: '3.4'
 services:
   consul:
     image: consul:latest
-    #command: agent -ui -dev
     ports:
     - "8500:8500"
     environment:
@@ -16,7 +15,11 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock
     depends_on:
       - consul
-    command: -cleanup -resync 60 -internal consul://consul:8500
+    command: -internal consul://consul:8500
+      # we may wish to add extra cleanup and syncing options
+      # http://gliderlabs.github.io/registrator/latest/user/run/
+      # -cleanup
+      # -resync 60
 
 
   nginx:
@@ -32,14 +35,25 @@ services:
       - SERVICE_443_NAME=nginx
       - SERVICE_TAGS=nginx,consul-template,load-balancing
 
-  # TODO: setup healtcheck endpoint. and healthchecking in general.
   foo:
-    image: node:alpine
-    command: node -e "const a={ip:os.networkInterfaces().eth0[0].address,hostname:os.hostname()}; http.createServer((req,res)=>{console.log(a); res.write(JSON.stringify(a)); res.end()}).listen(80)"
-    ports:
-      - "80"
+    build:
+      context: .
+      dockerfile: Dockerfile.demo-service
     environment:
       - SERVICE_NAME=foo
+      - SERVICE_CHECK_HTTP=/ping
+      - SERVICE_CHECK_INTERVAL=15s
       - SERVICE_80_NAME=foo
-      - SERVICE_TAGS=nodejs,dummy
+      - SERVICE_TAGS=golang,should-work,dummy
+
+  bar:
+    build:
+      context: .
+      dockerfile: Dockerfile.demo-service
+    environment:
+      - SERVICE_NAME=bar
+      - SERVICE_CHECK_HTTP=/fail
+      - SERVICE_CHECK_INTERVAL=15s
+      - SERVICE_80_NAME=bar
+      - SERVICE_TAGS=golang,should-fail,dummy
 

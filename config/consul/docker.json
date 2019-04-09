@@ -1,0 +1,10 @@
+{
+  "check": {
+    "id": "mem-util",
+    "name": "Memory utilization",
+    "docker_container_id": "f972c95ebf0e",
+    "shell": "/bin/bash",
+    "args": ["/usr/local/bin/check_mem.py"],
+    "interval": "10s"
+  }
+}
