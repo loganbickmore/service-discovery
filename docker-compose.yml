@@ -27,7 +27,7 @@ services:
       context: .
       dockerfile: Dockerfile.nginx
     ports:
-      - "8080:80"
+      - "80:80"
       - "8443:443"
     environment:
       - SERVICE_NAME=nginx
@@ -46,14 +46,36 @@ services:
       - SERVICE_80_NAME=foo
       - SERVICE_TAGS=golang,should-work,dummy
 
-  bar:
-    build:
-      context: .
-      dockerfile: Dockerfile.demo-service
+        #bar:
+        #build:
+        #context: .
+        #dockerfile: Dockerfile.demo-service
+        #environment:
+        #- SERVICE_NAME=bar
+        #- SERVICE_CHECK_HTTP=/fail
+        #- SERVICE_CHECK_INTERVAL=15s
+        #- SERVICE_80_NAME=bar
+        #- SERVICE_TAGS=golang,should-fail,dummy
+
+  gateway:
+    image: registry.safecu.org/gateway-service:1.0.0-rc1
     environment:
-      - SERVICE_NAME=bar
-      - SERVICE_CHECK_HTTP=/fail
+      - CORE_SERVICE_URL=http://nginx/core/v1
+      - SERVICE_CHECK_HTTP=/ping
       - SERVICE_CHECK_INTERVAL=15s
-      - SERVICE_80_NAME=bar
-      - SERVICE_TAGS=golang,should-fail,dummy
+      - SERVICE_NAME=gateway
+      - SERVICE_TAGS=gateway,graphql,nodejs
+
+  core:
+    image: registry.safecu.org/core-catalog-service:1.0.0-rc2
+    environment:
+      - SERVICE_NAME=core
+      - SERVICE_TAGS=core,pathways,nodejs
+      - SERVICE_CHECK_HTTP=/ping
+      - SERVICE_CHECK_INTERVAL=15s
+
+
+
+
+
 
